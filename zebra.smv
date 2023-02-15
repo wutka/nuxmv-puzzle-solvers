@@ -1,0 +1,97 @@
+-- This nuXmv model solves the famous Zebra puzzle (sometimes called
+-- the Einstein puzzle). The solve_state can only advance from 0 to 1
+-- if the various variables meet all the criteria of the puzzle, and
+-- by asserting that solve_state is never equal to 1, we let nuXmv
+-- find a counter example that solves the puzzle.
+--
+-- See: https://en.wikipedia.org/wiki/Zebra_Puzzle
+--
+MODULE main
+ VAR
+
+  red : 1 .. 5;
+  green : 1 .. 5;
+  ivory : 1 .. 5;
+  yellow : 1 .. 5;
+  blue : 1 .. 5;
+
+  englishman : 1 .. 5;
+  spaniard : 1 .. 5;
+  ukrainian : 1 .. 5;
+  norwegian : 1 .. 5;
+  japanese : 1 .. 5;
+
+  coffee : 1 .. 5;
+  tea : 1 .. 5;
+  milk : 1 .. 5;
+  orange_juice : 1 .. 5;
+  water : 1 .. 5;
+
+  old_gold : 1 .. 5;
+  kool : 1 .. 5;
+  chesterfield : 1 .. 5;
+  lucky_strike : 1 .. 5;
+  parliament : 1 .. 5;
+
+  dog : 1 .. 5;
+  snail : 1 .. 5;
+  fox : 1 .. 5;
+  horse : 1 .. 5;
+  zebra : 1 .. 5;
+
+  solve_state : 0 .. 1;
+
+ASSIGN
+  init(solve_state) := 0;
+
+  next(solve_state) :=
+    case
+      solve_state = 0 &
+     -- Make sure all the colors are unique
+        red != green & red != ivory & red != yellow & red != blue &
+        green != ivory & green != yellow & green != blue &
+        ivory != yellow & ivory != blue & yellow != blue &
+     -- Make sure all the nationalities are unique
+        englishman != spaniard & englishman != ukrainian & englishman != norwegian & englishman != japanese &
+        spaniard != ukrainian & spaniard != norwegian & spaniard != japanese &
+        ukrainian != norwegian & ukrainian != japanese & norwegian != japanese &
+     -- Make sure all the beverages are unique
+        coffee != tea & coffee != milk & coffee != orange_juice & coffee != water &
+        tea != milk & tea != orange_juice & tea != water &
+        milk != orange_juice & milk != water & orange_juice != water &
+     -- Make sure all the smokes are unique
+        old_gold != kool & old_gold != chesterfield & old_gold != lucky_strike & old_gold != parliament &
+        kool != chesterfield & kool != lucky_strike & kool != parliament &
+        chesterfield != lucky_strike & chesterfield != parliament & lucky_strike != parliament &
+     -- Make sure all the pets are unique
+        dog != snail & dog != fox & dog != horse & dog != zebra &
+        snail != fox & snail != horse & snail != zebra &
+        fox != horse & fox != zebra & horse != zebra &
+     -- The specific relations between the items given by the puzzle
+        englishman = red &
+        spaniard = dog &
+        coffee = green &
+        ukrainian = tea &
+        (ivory < 5 & green = ivory + 1) &
+        old_gold = snail &
+        kool = yellow &
+        milk = 3 &
+        norwegian = 1 &
+        lucky_strike = orange_juice &
+        japanese = parliament &
+     -- These next three represent "next to" relationships
+        ((fox < 5 & chesterfield = fox + 1) | (fox > 1 & chesterfield = fox - 1)) &
+        ((horse < 5 & kool = horse + 1) | (horse > 1 & kool = horse - 1)) &
+        ((blue < 5 & norwegian = blue + 1) | (blue > 1 & norwegian = blue - 1)) : 1;
+    -- Add another case for solve_state=0 to eliminate the warning about the
+    -- case not covering all possibilities
+      solve_state = 0 : 0;
+      solve_state = 1 : 1;
+    esac;
+
+  -- Assert that we can never get to solve_state=1. NuXmv will look for a counter-example
+  -- and give it, which gives the solution to the puzzle "Who owns the zebra?"
+  -- It finds a value of 5 for the zebra, so the owner of the zebra is in the 5th house,
+  -- and looking at the other values that equal 5, you can find the other attributes
+  -- of the person living in the fifth house.
+  INVARSPEC solve_state != 1;

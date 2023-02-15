@@ -1,0 +1,178 @@
+-- This program solves the Triangle Golf Tee puzzle where you
+-- jump tees over adjacent ones, removing the jumped-over tee
+-- until you end up with a single tee
+MODULE main
+
+VAR
+  state : { choose, execute, solved };
+  -- There are 36 possible jumps
+  peg_to_move : 0 .. 35;
+  board : array 1 .. 15 of boolean;
+
+ DEFINE
+  -- For the 36 possible jumps, first_peg is the originating peg
+  first_peg := [ 1, 1, 2, 2, 3, 3, 4, 4, 4, 5, 5, 6, 6, 7, 8, 11, 12, 13,
+    4, 6, 7, 9, 8, 10, 11, 13, 6, 12, 14, 13, 15, 9, 10, 13, 14, 15];
+  -- For the 36 possible jumps, second_peg is the middle peg that is jumped over
+  second_peg := [ 2, 3, 4, 5, 5, 6, 7, 8, 5, 8, 9, 9, 10, 8, 9, 12, 13, 14,
+                  2, 3, 4, 5, 5, 6, 7, 8, 5, 8, 9, 9, 10, 8, 9, 12, 13, 14];
+  -- For the 36 possible jumps, third_peg is the destionation of the jump
+  third_peg := [ 4, 6, 7, 9, 8, 10, 11, 13, 6, 12, 14, 13, 15, 9, 10, 13, 14, 15,
+    1, 1, 2, 2, 3, 3, 4, 4, 4, 5, 5, 6, 6, 7, 8, 11, 12, 13];
+
+ ASSIGN
+  init(state) := choose;
+
+-- Initialize the board with pegs everything but the top spot
+  init(board[1]) := FALSE;
+  init(board[2]) := TRUE;
+  init(board[3]) := TRUE;
+  init(board[4]) := TRUE;
+  init(board[5]) := TRUE;
+  init(board[6]) := TRUE;
+  init(board[7]) := TRUE;
+  init(board[8]) := TRUE;
+  init(board[9]) := TRUE;
+  init(board[10]) := TRUE;
+  init(board[11]) := TRUE;
+  init(board[12]) := TRUE;
+  init(board[13]) := TRUE;
+  init(board[14]) := TRUE;
+  init(board[15]) := TRUE;
+
+-- For each board position, if the board position is either first, second,
+-- or third peg for peg_to_move (which is chosen non-deterministically),
+-- update the board position accordingly. For any given value for peg_to_move,
+-- there will be three different board positions involved.
+  next(board[1]) :=
+    case
+      state = execute & first_peg[peg_to_move]=1 & board[1] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=1 & board[1] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=1 & !board[1] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[1];
+    esac;
+
+  next(board[2]) :=
+    case
+      state = execute & first_peg[peg_to_move]=2 & board[2] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=2 & board[2] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=2 & !board[2] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[2];
+    esac;
+
+  next(board[3]) :=
+    case
+      state = execute & first_peg[peg_to_move]=3 & board[3] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=3 & board[3] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=3 & !board[3] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[3];
+    esac;
+
+  next(board[4]) :=
+    case
+      state = execute & first_peg[peg_to_move]=4 & board[4] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=4 & board[4] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=4 & !board[4] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[4];
+    esac;
+
+  next(board[5]) :=
+    case
+      state = execute & first_peg[peg_to_move]=5 & board[5] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=5 & board[5] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=5 & !board[5] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[5];
+    esac;
+
+  next(board[6]) :=
+    case
+      state = execute & first_peg[peg_to_move]=6 & board[6] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=6 & board[6] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=6 & !board[6] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[6];
+    esac;
+
+  next(board[7]) :=
+    case
+      state = execute & first_peg[peg_to_move]=7 & board[7] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=7 & board[7] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=7 & !board[7] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[7];
+    esac;
+
+  next(board[8]) :=
+    case
+      state = execute & first_peg[peg_to_move]=8 & board[8] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=8 & board[8] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=8 & !board[8] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[8];
+    esac;
+
+  next(board[9]) :=
+    case
+      state = execute & first_peg[peg_to_move]=9 & board[9] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=9 & board[9] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=9 & !board[9] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[9];
+    esac;
+
+  next(board[10]) :=
+    case
+      state = execute & first_peg[peg_to_move]=10 & board[10] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=10 & board[10] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=10 & !board[10] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[10];
+    esac;
+
+  next(board[11]) :=
+    case
+      state = execute & first_peg[peg_to_move]=11 & board[11] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=11 & board[11] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=11 & !board[11] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[11];
+    esac;
+
+  next(board[12]) :=
+    case
+      state = execute & first_peg[peg_to_move]=12 & board[12] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=12 & board[12] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=12 & !board[12] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[12];
+    esac;
+
+  next(board[13]) :=
+    case
+      state = execute & first_peg[peg_to_move]=13 & board[13] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=13 & board[13] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=13 & !board[13] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[13];
+    esac;
+
+  next(board[14]) :=
+    case
+      state = execute & first_peg[peg_to_move]=14 & board[14] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=14 & board[14] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=14 & !board[14] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[14];
+    esac;
+
+  next(board[15]) :=
+    case
+      state = execute & first_peg[peg_to_move]=15 & board[15] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & second_peg[peg_to_move]=15 & board[15] & board[first_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
+      state = execute & third_peg[peg_to_move]=15 & !board[15] & board[first_peg[peg_to_move]] & board[second_peg[peg_to_move]] : TRUE;
+      TRUE : board[15];
+    esac;
+
+  next(state) :=
+    case
+    -- If there is exactly one peg left, the board is solved
+      count(board[1], board[2], board[3], board[4], board[5], board[6], board[7], board[8],
+        board[9], board[10], board[11], board[12], board[13], board[14], board[15]) = 1 & board[1] : solved;
+      state = choose : execute;
+      state = execute : choose;
+      TRUE : state;
+    esac;
+
+-- Assert that no solution is possible
+ INVARSPEC !(state = solved);

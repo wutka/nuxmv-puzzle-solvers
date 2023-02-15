@@ -1,0 +1,120 @@
+
+MODULE main
+ VAR
+
+-- Define the boat crossings, where right/left means you cross
+-- but don't take anything, then x_left and x_right mean you take
+-- item across in a particular direction (in this form of the puzzle,
+-- you start on the left and finish on the right)
+  action : { 
+    right, left,
+    c_right, c_left,
+    f_right, f_left,
+    g_right, g_left,
+    idle
+  };
+
+-- We have two stages - choosing a move to execute, and executing the move
+  state : { choose, execute };
+
+  farmer : { start, finish };
+  chicken : { start, finish };
+  fox : { start, finish };
+  grain : { start, finish };
+
+ ASSIGN
+-- Everyone starts on the start side
+  init(farmer) := start;
+  init(chicken) := start;
+  init(fox) := start;
+  init(grain) := start;
+
+  init(state) := choose;
+
+  next(state) :=
+    case
+      state = choose : execute;
+      state = execute : choose;
+    esac;
+
+  next(action) :=
+    case
+      state = execute : action;
+  -- Enumerate the possible moves in each possible state, eliminating
+  -- those that lead to an illegal state
+      chicken = start & fox = start & grain = start & farmer = start :
+        { c_right };
+      chicken = start & fox = start & grain = finish & farmer = start :
+        { c_right, f_right };
+      chicken = start & fox = finish & grain = start & farmer = start :
+        { c_right, g_right };
+      chicken = finish & fox = start & grain = start & farmer = start :
+        { right, f_right, g_right };
+      chicken = start & fox = finish & grain = finish & farmer = start :
+        { right, c_right };
+      chicken = finish & fox = start & grain = finish & farmer = start :
+        { right, f_right };
+      chicken = finish & fox = finish & grain = start & farmer = start :
+        { right, g_right };
+      chicken = finish & fox = finish & grain = finish & farmer = start :
+        { right };
+      chicken = start & fox = start & grain = start & farmer = finish :
+        { left };
+      chicken = start & fox = start & grain = finish & farmer = finish :
+        { left, g_left };
+      chicken = start & fox = finish & grain = start & farmer = finish :
+        { left, f_left };
+      chicken = finish & fox = start & grain = start & farmer = finish :
+        { left, c_left };
+      chicken = start & fox = finish & grain = finish & farmer = finish :
+        { left, f_left, g_left };
+      chicken = finish & fox = start & grain = finish & farmer = finish :
+        { c_left, g_left };
+      chicken = finish & fox = finish & grain = start & farmer = finish :
+        { c_left, f_left };
+      chicken = finish & fox = finish & grain = finish & farmer = finish :
+        { idle };
+    esac;
+
+  next(chicken) :=
+     case
+      state = choose : chicken;
+      state = execute & action = c_right : finish;
+      state = execute & action = c_left : start;
+      TRUE : chicken;
+     esac;
+
+  next(fox) :=
+     case
+      state = choose : fox;
+      state = execute & action = f_right : finish;
+      state = execute & action = f_left : start;
+      TRUE : fox;
+     esac;
+
+  next(grain) :=
+     case
+      state = choose : grain;
+      state = execute & action = g_right : finish;
+      state = execute & action = g_left : start;
+      TRUE : grain;
+     esac;
+
+  next(farmer) :=
+    case
+      state = choose : farmer;
+      state = execute & action = idle : farmer;
+      state = execute & farmer = start : finish;
+      state = execute & farmer = finish : start;
+    esac;
+
+-- You can't leave the chicken and the fox on the same
+-- side without the farmer
+ INVARSPEC ! (chicken = fox & chicken != farmer);
+
+-- You can't leave the chicken and the grain on the same
+-- side without the farmer
+ INVARSPEC ! (chicken = grain & chicken != farmer);
+
+-- Assert that you can't get everything safely across
+ INVARSPEC ! (chicken = finish & fox = finish & grain = finish & farmer = finish);
