@@ -16,7 +16,7 @@ VAR
   -- For the 36 possible jumps, second_peg is the middle peg that is jumped over
   second_peg := [ 2, 3, 4, 5, 5, 6, 7, 8, 5, 8, 9, 9, 10, 8, 9, 12, 13, 14,
                   2, 3, 4, 5, 5, 6, 7, 8, 5, 8, 9, 9, 10, 8, 9, 12, 13, 14];
-  -- For the 36 possible jumps, third_peg is the destionation of the jump
+  -- For the 36 possible jumps, third_peg is the destination of the jump
   third_peg := [ 4, 6, 7, 9, 8, 10, 11, 13, 6, 12, 14, 13, 15, 9, 10, 13, 14, 15,
     1, 1, 2, 2, 3, 3, 4, 4, 4, 5, 5, 6, 6, 7, 8, 11, 12, 13];
 
