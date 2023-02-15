@@ -4,8 +4,9 @@ MODULE main
 
 -- Define the boat crossings, where right/left means you cross
 -- but don't take anything, then x_left and x_right mean you take
--- item across in a particular direction (in this form of the puzzle,
--- you start on the left and finish on the right)
+-- item x across in a particular direction (in this form of the puzzle,
+-- you start on the left and finish on the right), c = chicken,
+-- f = fox, g = grain
   action : { 
     right, left,
     c_right, c_left,
@@ -39,9 +40,13 @@ MODULE main
 
   next(action) :=
     case
+  -- If this is the execute state, we don't change the action
       state = execute : action;
+
+  -- Otherwise, this is the choose state, so we pick a new action
   -- Enumerate the possible moves in each possible state, eliminating
   -- those that lead to an illegal state
+
       chicken = start & fox = start & grain = start & farmer = start :
         { c_right };
       chicken = start & fox = start & grain = finish & farmer = start :
@@ -78,7 +83,10 @@ MODULE main
 
   next(chicken) :=
      case
+     -- Don't move anything if we are just choosing a move
       state = choose : chicken;
+
+     -- Otherwise, move the chicken (if necessary) based on the action
       state = execute & action = c_right : finish;
       state = execute & action = c_left : start;
       TRUE : chicken;
@@ -86,7 +94,9 @@ MODULE main
 
   next(fox) :=
      case
+     -- Don't move anything if we are just choosing a move
       state = choose : fox;
+     -- Otherwise, move the fox (if necessary) based on the action
       state = execute & action = f_right : finish;
       state = execute & action = f_left : start;
       TRUE : fox;
@@ -94,7 +104,9 @@ MODULE main
 
   next(grain) :=
      case
+     -- Don't move anything if we are just choosing a move
       state = choose : grain;
+     -- Otherwise, move the grain (if necessary) based on the action
       state = execute & action = g_right : finish;
       state = execute & action = g_left : start;
       TRUE : grain;
@@ -102,7 +114,10 @@ MODULE main
 
   next(farmer) :=
     case
+     -- Don't move anything if we are just choosing a move
       state = choose : farmer;
+     -- Unless the action is idle, the farmer moves every
+     -- time, so he alternates between start and finish
       state = execute & action = idle : farmer;
       state = execute & farmer = start : finish;
       state = execute & farmer = finish : start;

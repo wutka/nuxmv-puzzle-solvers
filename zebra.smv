@@ -9,6 +9,15 @@
 MODULE main
  VAR
 
+-- The variables for each attribute in the puzzle have values from
+-- 1 to 5, indicating which house they are associated with. The ultimate
+-- solution assigns each type of attribute to a unique house according
+-- to the various constraints. To find out who owns the zebra you look
+-- at what number zebra has, and then find the other attributes that
+-- have the same number (e.g. if zebra = 1 and norwegian = 1 and milk = 1
+-- and kool = 1, and green = 1 then the norwegian in the green house who
+-- drinks milk and smokes kools owns the zebra)
+
   red : 1 .. 5;
   green : 1 .. 5;
   ivory : 1 .. 5;
@@ -51,22 +60,27 @@ ASSIGN
         red != green & red != ivory & red != yellow & red != blue &
         green != ivory & green != yellow & green != blue &
         ivory != yellow & ivory != blue & yellow != blue &
+
      -- Make sure all the nationalities are unique
         englishman != spaniard & englishman != ukrainian & englishman != norwegian & englishman != japanese &
         spaniard != ukrainian & spaniard != norwegian & spaniard != japanese &
         ukrainian != norwegian & ukrainian != japanese & norwegian != japanese &
+
      -- Make sure all the beverages are unique
         coffee != tea & coffee != milk & coffee != orange_juice & coffee != water &
         tea != milk & tea != orange_juice & tea != water &
         milk != orange_juice & milk != water & orange_juice != water &
+        
      -- Make sure all the smokes are unique
         old_gold != kool & old_gold != chesterfield & old_gold != lucky_strike & old_gold != parliament &
         kool != chesterfield & kool != lucky_strike & kool != parliament &
         chesterfield != lucky_strike & chesterfield != parliament & lucky_strike != parliament &
+
      -- Make sure all the pets are unique
         dog != snail & dog != fox & dog != horse & dog != zebra &
         snail != fox & snail != horse & snail != zebra &
         fox != horse & fox != zebra & horse != zebra &
+
      -- The specific relations between the items given by the puzzle
         englishman = red &
         spaniard = dog &

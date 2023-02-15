@@ -51,6 +51,33 @@ VAR
 -- or third peg for peg_to_move (which is chosen non-deterministically),
 -- update the board position accordingly. For any given value for peg_to_move,
 -- there will be three different board positions involved.
+
+-- For each of these board clauses, there are 4 possibilities based on the
+-- peg_to_move variable which nuXmv selects automatically at each round.
+-- While it is possible for it to select one that doesn't do anything, the
+-- solution it finds has only valid moves.
+-- For each possible board position (1-15) there are 4 possible outcomes
+-- based on peg_to_move:
+--
+-- 1. The board position is the peg doing the jumping (first_peg[peg_to_move] = board position).
+--    If the position being jumped over has a peg (board[second_peg[peg_to_move]] is true) and
+--    the destination position is empty (board[third_peg[peg_to_move]] is false), then the
+--    move is valid, and this board position should now be marked empty (false).
+--
+-- 2. The board position is the peg being jumped over (second_peg[peg_to_move] = board position).
+--    If the jumping peg position has a peg (board[first_peg[peg_to_move]] is true) and the
+--    destination position is empty (board[third_peg[peg_to_move]] is false), then the
+--    move is valid, and this board position should now be marked as empty (false).
+--
+-- 3. The board position is the destination for the jumping peg (third_peg[peg_to_move] = board position).
+--    If the jumping peg position has a peg (board[first_peg[peg_to_move]] is true) and the
+--    jumped-over position has a peg (board[second_peg[peg_to_move]] is true), then the
+--    move is valid, and this board position should now contain a peg (true).
+--
+-- 4. Either this board position is not one of the positions in the selected jump, or
+--    the other conditions for the jump to happen are not met. In this case, the board
+--    position is unchanged.
+--
   next(board[1]) :=
     case
       first_peg[peg_to_move]=1 & board[1] & board[second_peg[peg_to_move]] & !board[third_peg[peg_to_move]] : FALSE;
