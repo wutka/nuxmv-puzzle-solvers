@@ -37,3 +37,10 @@ The `tees.smv` file solves the Triangle Golf Tee puzzle where you start
 with a triangle with 15 holes and golf tees in 14 holes. You pick a tee that
 can jump over an adjacent tee into an empty spot on the other side, and remove
 the jumped-over tee, and repeat this until there is exactly one tee left.
+
+## konigsberg.smv
+
+The `konigsberg.smv` confirms what Leonard Euler proved in 1736, that it was
+not possible to devise a walk around Königsberg that crossed each of its
+seven bridges exactly once. Of course, the nuXmv solution is not using the
+same method that Euler did.

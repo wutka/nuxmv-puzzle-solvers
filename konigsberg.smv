@@ -1,0 +1,115 @@
+-- This is a nuXmv presentation of the Koenigsberg seven bridge problem.
+-- The Prussian city of Koenigsberg (now Kaliningrad, Russia) had seven
+-- bridges connecting four landmasses. The four landmasses are the areas
+-- north and south of the Pregel river, and two islands in the river -
+-- Kneiphof and Lomse.
+-- The bridges were:
+--   Merchants, and Forge between Kneiphof and the north bank
+--   Honey between Kneiphof and Lomse
+--   Koettelbruecke and Green between Kneiphof and the south bank
+--   Wooden between Lomse and the south bank
+--
+-- The question was, was it possible to walk through the city, crossing
+-- each bridge exactly once. Leonard Euler solved the problem (the
+-- answer is no) and in doing so, essentially invented graph theory. 
+--
+-- Here we see if nuXmv can prove that it is not possible.
+MODULE main
+ VAR
+ -- We are either in a state of choosing which bridge to take next,
+ -- taking one of the bridges, or we have solved the problem and crossed
+ -- all the bridges.
+  state : { choosing, crossing_merchants, crossing_forge, crossing_high,
+    crossing_honey, crossing_koettelbruecke, crossing_green,
+    crossing_wooden, solved };
+
+-- There are four places we can be
+  location : { north, south, kneiphof, lomse };
+
+-- For each bridge, use a boolean flag to indicate whether we have crossed it
+  merchants : boolean;
+  forge : boolean;
+  high : boolean;
+  honey : boolean;
+  koettelbruecke : boolean;
+  green : boolean;
+  wooden : boolean;
+
+ASSIGN
+-- We start out choosing what we want to do
+  init(state) := choosing;
+
+-- None of the bridges have been crossed
+  init(merchants) := FALSE;
+  init(forge) := FALSE;
+  init(high) := FALSE;
+  init(honey) := FALSE;
+  init(koettelbruecke) := FALSE;
+  init(green) := FALSE;
+  init(wooden) := FALSE;
+  
+  next(state) :=
+    case
+      -- If all 7 bridges have been crossed, we have solved the problem
+      state = choosing & merchants & forge & high & 
+        honey & koettelbruecke & green & wooden : solved;
+
+      -- If we are on the north bank, we can try crossing merchants, forge or high
+      state = choosing & location = north : {crossing_merchants, crossing_forge, crossing_high };
+
+      -- If we are on the south bank, we can try green, koettelbruecke, or wooden
+      state = choosing & location = south : {crossing_green, crossing_koettelbruecke, crossing_wooden};
+
+      -- If we are on Kneiphof, we can try merchants, forge, or honey
+      state = choosing & location = kneiphof : { crossing_merchants, crossing_forge, crossing_honey,
+        crossing_koettelbruecke, crossing_green};
+
+      -- If we are on Lomse, we can try high, honey, or wooden
+      state = choosing & location = lomse : { crossing_high, crossing_honey, crossing_wooden };
+
+      -- Otherwise default to choosing
+      TRUE : choosing;
+    esac;
+
+  next(location) :=
+    case
+      -- For each combination of location and bridge, only cross the bridge if
+      -- it hasn't been crossed.
+      -- Since the locations are separated by blank lines and each line represents
+      -- a bridge touching that location, notice that each block of lines has an
+      -- odd number of lines. This observation was key to Euler's solution.
+
+      location = north & state = crossing_merchants & !merchants : kneiphof;
+      location = north & state = crossing_forge & !forge : kneiphof;
+      location = north & state = crossing_high & !high : lomse;
+
+      location = south & state = crossing_green & !green : kneiphof;
+      location = south & state = crossing_koettelbruecke & !koettelbruecke : kneiphof;
+      location = south & state = crossing_wooden & !wooden : lomse;
+
+      location = kneiphof & state = crossing_merchants & !merchants : north;
+      location = kneiphof & state = crossing_forge & !forge : north;
+      location = kneiphof & state = crossing_honey & !honey : lomse;
+      location = kneiphof & state = crossing_koettelbruecke & !koettelbruecke : south;
+      location = kneiphof & state = crossing_green & !green : south;
+
+      location = lomse & state = crossing_high & !high : north;
+      location = lomse & state = crossing_honey & !honey : kneiphof;
+      location = lomse & state = crossing_wooden & !wooden : south;
+
+      -- Otherwise, just stay in place
+      TRUE : location;
+    esac;
+
+-- For each bridge flag, it either remains true, or it flips to true
+-- if we are crossing that bridge
+  next(merchants) := merchants | state = crossing_merchants;
+  next(forge) := forge | state = crossing_forge;
+  next(high) := high | state = crossing_high;
+  next(honey) := honey | state = crossing_honey;
+  next(koettelbruecke) := koettelbruecke | state = crossing_koettelbruecke;
+  next(green) := green | state = crossing_green;
+  next(wooden) := wooden | state = crossing_wooden;
+
+-- Assert that there is no solution to the problem
+  INVARSPEC !(state = solved);
